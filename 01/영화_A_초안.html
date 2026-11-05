@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>K-Contents Tier List</title>
+    <style>
+        /* CSS: 디자인 */
+        body { background-color: #f5f5f5; font-family: 'Helvetica Neue', Arial, sans-serif; padding: 20px; color: #333; transition: all 0.3s; }
+        header { text-align: center; margin-bottom: 20px; position: relative; }
+        h1 { color: #ff6f61; margin-bottom: 5px; }
+        
+        /* 언어 전환 버튼 스타일 */
+        .lang-switch {
+            position: absolute; top: 0; right: 0;
+            padding: 8px 15px; border-radius: 20px; border: 2px solid #ff6f61;
+            background: white; color: #ff6f61; cursor: pointer; font-weight: bold;
+        }
+        .lang-switch:hover { background: #ff6f61; color: white; }
+
+        #tier-container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+        .tier-row { display: flex; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); min-height: 160px; }
+        .tier-label { width: 80px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 1.1rem; }
+        .label-1 { background-color: #ff7f7f; } .label-2 { background-color: #ffbf7f; } .label-3 { background-color: #ffff7f; color: #555; }
+        .tier-content { flex: 1; display: flex; flex-wrap: wrap; padding: 10px; gap: 10px; }
+        
+        .movie-card { width: 120px; background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 8px; text-align: center; font-size: 0.75rem; }
+        .movie-card img { width: 100%; border-radius: 4px; margin-bottom: 5px; }
+        .movie-title { font-weight: bold; display: block; margin-bottom: 2px; height: 2.4em; overflow: hidden; }
+        .btn-group { display: flex; justify-content: space-between; margin-top: 5px; }
+        .btn-group button { border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 0.7rem; background: #fff; padding: 2px 5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <button class="lang-switch" onclick="toggleLanguage()">日本語 / 한국어</button>
+        <h1 id="main-title">🇰🇷 K-Contents Tier List</h1>
+        <p id="sub-title">お気に入りの作品を分類しましょう</p>
+    </header>
+
+    <main id="tier-container">
+        <section class="tier-row" id="tier-1"><div class="tier-label label-1">Tier 1</div><div class="tier-content"></div></section>
+        <section class="tier-row" id="tier-2"><div class="tier-label label-2">Tier 2</div><div class="tier-content"></div></section>
+        <section class="tier-row" id="tier-3"><div class="tier-label label-3">Tier 3</div><div class="tier-content"></div></section>
+    </main>
+
+    <script>
+        // 1. 데이터 및 언어 설정
+        let currentLang = 'ja'; // 기본값: 일본어
+        const movies = [
+            { id: 1, ko: "더 글로리", ja: "ザ・グローリー", platform: "Netflix", price_ja: "月額 990円~", price_ko: "월 9,500원~", poster: "https://via.placeholder.com/100x140/ffcccc?text=Glory" },
+            { id: 2, ko: "범죄도시", ja: "犯罪都市", platform: "U-NEXT", price_ja: "500円", price_ko: "5,000원", poster: "https://via.placeholder.com/100x140/cceeff?text=Outlaws" },
+            { id: 3, ko: "이상한 변호사 우영우", ja: "ウ・ヨンウ弁護士は天才肌", platform: "Netflix", price_ja: "月額 990円~", price_ko: "월 9,500원~", poster: "https://via.placeholder.com/100x140/e2f0cb?text=Woo" }
+        ];
+
+        const uiText = {
+            ja: { subTitle: "お気に入りの作品を分類しましょう", tier: "Tier" },
+            ko: { subTitle: "좋아하는 작품을 분류해보세요", tier: "티어" }
+        };
+
+        // 2. 화면 그리기 함수
+        function render() {
+            // 헤더 텍스트 변경
+            document.getElementById('sub-title').innerText = uiText[currentLang].subTitle;
+
+            // 기존 카드들 삭제 후 다시 그리기 (또는 텍스트만 업데이트)
+            // 여기서는 간단하게 텍스트만 업데이트하는 방식을 사용합니다.
+            movies.forEach(movie => {
+                let card = document.getElementById(`movie-${movie.id}`);
+                
+                // 카드가 없으면 새로 생성 (초기 실행 시)
+                if (!card) {
+                    card = document.createElement('div');
+                    card.className = 'movie-card';
+                    card.id = `movie-${movie.id}`;
+                    document.querySelector('#tier-1 .tier-content').appendChild(card);
+                }
+
+                // 내용 업데이트
+                card.innerHTML = `
+                    <img src="${movie.poster}">
+                    <span class="movie-title">${currentLang === 'ja' ? movie.ja : movie.ko}</span>
+                    <div style="color:#888; font-size:0.65rem; margin-bottom:5px;">
+                        ${movie.platform}<br>
+                        ${currentLang === 'ja' ? movie.price_ja : movie.price_ko}
+                    </div>
+                    <div class="btn-group">
+                        <button onclick="move(${movie.id}, 1)">1</button>
+                        <button onclick="move(${movie.id}, 2)">2</button>
+                        <button onclick="move(${movie.id}, 3)">3</button>
+                    </div>
+                `;
+            });
+        }
+
+        // 3. 언어 전환 함수
+        function toggleLanguage() {
+            currentLang = (currentLang === 'ja') ? 'ko' : 'ja';
+            render();
+        }
+
+        // 4. 이동 함수
+        function move(id, tier) {
+            const card = document.getElementById(`movie-${id}`);
+            document.querySelector(`#tier-${tier} .tier-content`).appendChild(card);
+        }
+
+        // 초기 실행
+        render();
+    </script>
+</body>
+</html>
