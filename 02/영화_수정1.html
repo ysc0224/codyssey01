@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-콘텐츠 티어리스트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn {
+            background: white;
+            color: #667eea;
+        }
+
+        .lang-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .reset-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .tier {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .tier-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            color: #333;
+        }
+
+        .tier-content {
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .movie-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: move;
+        }
+
+        .movie-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .movie-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .movie-platform {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .movie-price {
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .tier-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tier-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 6px;
+            font-size: 0.9em;
+            min-width: 50px;
+        }
+
+        .tier-btn:hover {
+            background: #764ba2;
+        }
+
+        .tier-btn.active {
+            background: #ff6b6b;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇰🇷 K-콘텐츠 티어리스트</h1>
+            <div class="header-buttons">
+                <button class="lang-btn" onclick="toggleLanguage()">日本語로 보기</button>
+                <button class="reset-btn" onclick="resetTiers()">처음으로</button>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="tier">
+                <div class="tier-title">Tier 1</div>
+                <div class="tier-content" id="tier-1"></div>
+            </div>
+            <div class="tier">
+                <div class="tier-title">Tier 2</div>
+                <div class="tier-content" id="tier-2"></div>
+            </div>
+            <div class="tier">
+                <div class="tier-title">Tier 3</div>
+                <div class="tier-content" id="tier-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 언어 데이터 =====
+        const uiText = {
+            ko: {
+                title: "🇰🇷 K-콘텐츠 티어리스트",
+                langBtn: "日本語로 보기",
+                resetBtn: "처음으로",
+                tier1: "Tier 1",
+                tier2: "Tier 2",
+                tier3: "Tier 3"
+            },
+            ja: {
+                title: "🇰🇷 K-コンテンツ ティアリスト",
+                langBtn: "한국어로 보기",
+                resetBtn: "最初に戻す",
+                tier1: "Tier 1",
+                tier2: "Tier 2",
+                tier3: "Tier 3"
+            }
+        };
+
+        // ===== 영화 데이터 =====
+        const movies = [
+            {
+                id: 1,
+                title_ko: "더 글로리",
+                title_ja: "ザ・グローリー",
+                poster: "https://via.placeholder.com/200x300?text=The+Glory",
+                platform_ko: "넷플릭스",
+                platform_ja: "Netflix",
+                price_ko: "월 9,500원~",
+                price_ja: "月額990円~",
+                currentTier: 1  // 🔴 추가: 현재 Tier 위치 기록
+            },
+            {
+                id: 2,
+                title_ko: "범죄도시",
+                title_ja: "犯罪都市",
+                poster: "https://via.placeholder.com/200x300?text=Crime+City",
+                platform_ko: "넷플릭스",
+                platform_ja: "Netflix",
+                price_ko: "월 9,500원~",
+                price_ja: "月額990円~",
+                currentTier: 1
+            },
+            {
+                id: 3,
+                title_ko: "이상한 변호사 우영우",
+                title_ja: "異常な弁護士ウ・ヨンウ",
+                poster: "https://via.placeholder.com/200x300?text=Extraordinary+Attorney",
+                platform_ko: "ENA",
+                platform_ja: "ENA",
+                price_ko: "월 5,900원~",
+                price_ja: "月額600円~",
+                currentTier: 1
+            },
+            {
+                id: 4,
+                title_ko: "오징어 게임",
+                title_ja: "イカゲーム",
+                poster: "https://via.placeholder.com/200x300?text=Squid+Game",
+                platform_ko: "넷플릭스",
+                platform_ja: "Netflix",
+                price_ko: "월 9,500원~",
+                price_ja: "月額990円~",
+                currentTier: 1
+            },
+            {
+                id: 5,
+                title_ko: "기생충",
+                title_ja: "パラサイト",
+                poster: "https://via.placeholder.com/200x300?text=Parasite",
+                platform_ko: "넷플릭스",
+                platform_ja: "Netflix",
+                price_ko: "월 9,500원~",
+                price_ja: "月額990円~",
+                currentTier: 1
+            },
+            {
+                id: 6,
+                title_ko: "도깨비",
+                title_ja: "トッケビ",
+                poster: "https://via.placeholder.com/200x300?text=Goblin",
+                platform_ko: "tvN",
+                platform_ja: "tvN",
+                price_ko: "월 9,900원~",
+                price_ja: "月額1,000円~",
+                currentTier: 1
+            }
+        ];
+
+        let currentLang = 'ko';
+
+        // ===== 영화 카드 생성 =====
+        function createMovieCard(movie) {
+            const title = currentLang === 'ko' ? movie.title_ko : movie.title_ja;
+            const platform = currentLang === 'ko' ? movie.platform_ko : movie.platform_ja;
+            const price = currentLang === 'ko' ? movie.price_ko : movie.price_ja;
+
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.draggable = true;
+            card.dataset.movieId = movie.id;
+
+            card.innerHTML = `
+                <img src="${movie.poster}" alt="${title}">
+                <div class="movie-title">${title}</div>
+                <div class="movie-platform">${platform}</div>
+                <div class="movie-price">${price}</div>
+                <div class="tier-buttons">
+                    <button class="tier-btn ${movie.currentTier === 1 ? 'active' : ''}" onclick="moveToTier(${movie.id}, 1)">1</button>
+                    <button class="tier-btn ${movie.currentTier === 2 ? 'active' : ''}" onclick="moveToTier(${movie.id}, 2)">2</button>
+                    <button class="tier-btn ${movie.currentTier === 3 ? 'active' : ''}" onclick="moveToTier(${movie.id}, 3)">3</button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // ===== 화면 렌더링 (수정됨) =====
+        function render() {
+            // UI 텍스트 업데이트
+            document.querySelector('h1').innerText = uiText[currentLang].title;
+            document.querySelector('.lang-btn').innerText = uiText[currentLang].langBtn;
+            document.querySelector('.reset-btn').innerText = uiText[currentLang].resetBtn;
+
+            // 🔴 수정: 각 Tier별로 해당하는 영화만 찾아서 배치
+            for (let tier = 1; tier <= 3; tier++) {
+                const tierId = `tier-${tier}`;
+                const tierContent = document.querySelector(`#${tierId}`);
+                tierContent.innerHTML = ''; // 기존 카드 삭제
+
+                // 이 Tier에 속한 영화들만 찾기
+                const moviesInTier = movies.filter(movie => movie.currentTier === tier);
+
+                // 찾은 영화들을 카드로 만들어서 추가
+                moviesInTier.forEach(movie => {
+                    const card = createMovieCard(movie);
+                    tierContent.appendChild(card);
+                });
+            }
+        }
+
+        // ===== 영화를 다른 Tier로 이동 =====
+        function moveToTier(movieId, tierNumber) {
+            // 🔴 수정: 영화의 currentTier를 새로운 번호로 저장
+            const movie = movies.find(m => m.id === movieId);
+            if (movie) {
+                movie.currentTier = tierNumber;
+                render(); // 화면 다시 그리기
+            }
+        }
+
+        // ===== 언어 전환 =====
+        function toggleLanguage() {
+            currentLang = currentLang === 'ko' ? 'ja' : 'ko';
+            render(); // 🔴 수정: 이제 currentTier를 읽으므로 배치가 유지됨
+        }
+
+        // ===== 처음으로 (모든 영화를 Tier 1로 초기화) =====
+        function resetTiers() {
+            movies.forEach(movie => {
+                movie.currentTier = 1; // 🔴 수정: currentTier를 1로 초기화
+            });
+            render();
+        }
+
+        // ===== 페이지 로드 시 초기 렌더링 =====
+        render();
+    </script>
+</body>
+</html>
