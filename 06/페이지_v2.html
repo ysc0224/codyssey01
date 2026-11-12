@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <title>코디세이 입학연수 설문조사</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+    .card { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    h1 { font-size: 20px; margin-bottom: 8px; color: #1a1a2e; }
+    p.desc { font-size: 13px; color: #888; margin-bottom: 24px; }
+    .q { margin-bottom: 24px; }
+    .q label.title { font-weight: bold; display: block; margin-bottom: 8px; }
+    .q .opt { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 14px; }
+    textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 90px; }
+    .required { color: red; }
+    .optional { color: #aaa; font-size: 12px; font-weight: normal; }
+    .btns { display: flex; gap: 10px; margin-top: 16px; }
+    button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; }
+    .btn-submit { background: #4a6cf7; color: #fff; }
+    .btn-anon   { background: #eef; color: #4a6cf7; }
+    .err { color: red; font-size: 12px; display: none; margin-top: 4px; }
+    #done { display: none; text-align: center; padding: 40px 0; }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <div id="done">
+    <div style="font-size:48px">🎉</div>
+    <h2>제출 완료! 감사합니다 😊</h2>
+  </div>
+
+  <form id="form" novalidate>
+    <h1>코디세이 입학연수 설문조사</h1>
+    <p class="desc">입학연수를 경험하며 느낀 점을 자유롭게 알려주세요.<br>
+    <strong>*</strong> 필수 항목 · 억지로 작성하실 필요 없습니다.</p>
+
+    <!-- Q1 체크박스 (필수) -->
+    <div class="q">
+      <label class="title">Q1. 도움이 된 활동을 모두 선택해 주세요 <span class="required">*</span></label>
+      <div class="opt"><input type="checkbox" name="q1" value="강의"> 강의 및 학습 자료</div>
+      <div class="opt"><input type="checkbox" name="q1" value="멘토링"> 멘토링 / 피드백</div>
+      <div class="opt"><input type="checkbox" name="q1" value="팀활동"> 팀 프로젝트</div>
+      <div class="opt"><input type="checkbox" name="q1" value="디스코드"> 디스코드 소통</div>
+      <div class="err" id="e1">최소 1개 이상 선택해 주세요.</div>
+    </div>
+
+    <!-- Q2 라디오 (필수) -->
+    <div class="q">
+      <label class="title">Q2. 전반적인 만족도는? <span class="required">*</span></label>
+      <div class="opt"><input type="radio" name="q2" value="매우만족"> 😄 매우 만족</div>
+      <div class="opt"><input type="radio" name="q2" value="만족"> 🙂 만족</div>
+      <div class="opt"><input type="radio" name="q2" value="보통"> 😐 보통</div>
+      <div class="opt"><input type="radio" name="q2" value="불만족"> 😕 불만족</div>
+      <div class="err" id="e2">항목을 선택해 주세요.</div>
+    </div>
+
+    <!-- Q3 서술형 (선택) -->
+    <div class="q">
+      <label class="title">Q3. 개선되었으면 하는 점 <span class="optional">(선택)</span></label>
+      <textarea name="q3" placeholder="자유롭게 적어주세요 :)"></textarea>
+    </div>
+
+    <!-- 버튼 -->
+    <div class="btns">
+      <button type="button" class="btn-anon" id="anonBtn">🕵️ 익명 제출</button>
+      <button type="submit" class="btn-submit">제출하기 →</button>
+    </div>
+  </form>
+
+</div>
+
+<script>
+  function validate() {
+    let ok = true;
+    // Q1 체크박스
+    if (!document.querySelector('input[name="q1"]:checked')) {
+      document.getElementById('e1').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('e1').style.display = 'none';
+    }
+    // Q2 라디오
+    if (!document.querySelector('input[name="q2"]:checked')) {
+      document.getElementById('e2').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('e2').style.display = 'none';
+    }
+    return ok;
+  }
+
+  function submit(isAnon) {
+    if (!validate()) return;
+    const q1 = [...document.querySelectorAll('input[name="q1"]:checked')].map(e => e.value);
+    const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+    const q3 = document.querySelector('textarea[name="q3"]').value;
+    console.log({ 익명: isAnon, q1, q2, q3 });
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+  }
+
+  document.getElementById('form').addEventListener('submit', e => { e.preventDefault(); submit(false); });
+  document.getElementById('anonBtn').addEventListener('click', () => submit(true));
+</script>
+</body>
+</html>
